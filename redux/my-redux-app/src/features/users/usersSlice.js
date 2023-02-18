@@ -2,7 +2,7 @@ import {createSlice} from "@reduxjs/toolkit";
 
 const initialState = [
     {id: '0', name: 'Dude Lebowsky'},
-    {id: '1', name: 'DaveGray'},
+    {id: '1', name: 'Dave Gray'},
     {id: '2', name: 'Andrej Istomin'}
 ];
 
