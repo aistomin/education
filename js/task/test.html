@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test task</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.js"></script>
+</head>
+<body>
+<input type="file" id="file-input"/>
+
+<h3>Raw content of the file:</h3>
+<table id="raw-records" border="1" cellspacing="1" cellpadding="1">
+    <thead>
+    <tr>
+        <td>Raw</td>
+    </tr>
+    </thead>
+</table>
+<h3>Parse and process:</h3>
+<button id="display-results">Display results</button>
+<br>
+<br>
+<table id="parsed-records" border="1" cellspacing="1" cellpadding="1">
+    <thead>
+    <tr>
+        <td>First Name</td>
+        <td>Last Name</td>
+        <td>Age</td>
+        <td>Gender</td>
+    </tr>
+    </thead>
+</table>
+<script>
+
+    const persons = []
+
+    function readSingleFile(e) {
+        const file = e.target.files[0];
+        if (!file) {
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            var content = e.target.result;
+            var lines = content.split(/\r\n|\n/);
+            for (const line of lines) {
+                console.log(line)
+                const parts = line.split(',');
+                persons.push({
+                    firstName: parts[0],
+                    lastName: parts[1],
+                    birthday: parts[2],
+                    gender: parts[3],
+                    raw: line
+                })
+            }
+            displayContent(persons);
+        };
+        reader.readAsText(file);
+    }
+
+    function displayContent(persons) {
+        const rawTable = document.getElementById('raw-records')
+        while (rawTable.rows.length > 1) {
+            rawTable.deleteRow(rawTable.rows.length - 1);
+        }
+        for (const person of persons) {
+            const row = rawTable.insertRow();
+            const cell = row.insertCell()
+            cell.textContent = person.raw
+        }
+    }
+
+    function onButtonClick() {
+        const rawTable = document.getElementById('parsed-records')
+        while (rawTable.rows.length > 1) {
+            rawTable.deleteRow(rawTable.rows.length - 1);
+        }
+        for (const person of persons) {
+            const row = rawTable.insertRow();
+            const firstName = row.insertCell()
+            firstName.textContent = person.firstName
+            const lastName = row.insertCell()
+            lastName.textContent = person.firstName
+            const age = row.insertCell()
+            age.textContent = calculateAge(person.birthday)
+            const gender = row.insertCell()
+            if (person.gender === "m") {
+                gender.textContent = "Male";
+                row.style.backgroundColor = '#5ba1d3';
+            } else if (person.gender === "f") {
+                gender.textContent = "Female";
+                row.style.backgroundColor = '#e38aea';
+            } else {
+                gender.textContent = "Unknown"
+                row.style.backgroundColor = '#d91229';
+            }
+        }
+    }
+
+    function calculateAge(birthday) {
+        // todo: fixme
+        let bd = moment.tz(birthday, "DD.MM.YYYY", "America/Los_Angeles").toDate();
+        console.log(bd)
+        const ageDifMs = Date.now() - bd.getTime();
+        const ageDate = new Date(ageDifMs);
+        return Math.abs(ageDate.getUTCFullYear() - 1970);
+    }
+
+    document.getElementById('file-input').addEventListener('change', readSingleFile, false);
+    document.getElementById('display-results').addEventListener('click', onButtonClick, false);
+</script>
+</body>
+</html>
